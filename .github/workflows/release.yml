@@ -1,0 +1,39 @@
+name: Release
+
+# The only path that may publish this package to npm — see PUBLISHING.md.
+# Cutting a GitHub Release is the trigger; the tag name is expected to match
+# the version in package.json (e.g. v2.0.0 for "2.0.0").
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # required for npm provenance / OIDC trusted publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing (OIDC) needs a recent npm CLI — newer than what
+      # Node 20 bundles by default.
+      - run: npm install -g npm@latest
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      # No NPM_TOKEN anywhere in this workflow, on purpose: this package's
+      # npm trusted publisher is configured (on npmjs.com, see PUBLISHING.md)
+      # to accept only this exact repo + workflow file via OIDC. npm's CLI
+      # detects the `id-token: write` permission above and exchanges it for
+      # a short-lived publish token automatically.
+      - run: npm publish --access public --provenance
