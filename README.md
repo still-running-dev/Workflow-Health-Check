@@ -129,4 +129,4 @@ storing results can tell which shape they were written under.
 
 ---
 
-Built by Ali Alsamraay in Amman. [stillrunning.dev](https://stillrunning.dev)
+Built by Ali Alsamraay. [stillrunning.dev](https://stillrunning.dev)
